@@ -177,13 +177,16 @@ Id est: the equivalent code could be sent to a new Python file to:
 It uses:
  * metaprogramming libraries, such as inspect and types;
  * Json format for storing the call graph;
- * multithreading queues, to decouple calls to the original function from the call graph storing
+ * multithreading queues, to decouple calls to the original function from the call graph storing.
 
 ##Future work
 
 This is the remaining work:
- * generate an egg
- * make it work for classes inhereted from Object
- * test with heavy load
- * implement a mockyfier, reading from the Json file to mimic a previous execution.
+ * generate an egg;
+ * kill the annotator thread in case of exceptions;
+ * make it work for classes inhereted from Object;
+ * test with heavy load.
 
+And some ideas to improve its capabilities:
+ * simplify the annotation invocations, for instance: annotate all classes and functions of a module recursively.
+ * implement a mockyfier, reading from the Json file to mimic a previous execution.
