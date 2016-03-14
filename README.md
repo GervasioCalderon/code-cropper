@@ -172,6 +172,150 @@ Id est: the equivalent code could be sent to a new Python file to:
  * simplify the original code;
  * generate an automatic Unit Test.
 
+##Json database for running
+The Json database generated (in the example, file in "/tmp/my_running.json") contains all the information needed to reproduce the program execution. It uses a hierarchy module -> class -> function, and all these "objects" are represented in the Database, being the model normalized. Every object (a module, class or function) has a unique id, and it is registered only once. This is the Json generated from the example:
+
+```json
+{
+    "callGraph": [
+        {
+            "arguments": {
+                "args": [
+                    3
+                ], 
+                "kargs": {}
+            }, 
+            "calleeId": 3, 
+            "funcName": "__init__", 
+            "id": 1, 
+            "level": 0, 
+            "methodType": "constructor", 
+            "returnedObject": 6, 
+            "threwException": false
+        }, 
+        {
+            "arguments": {
+                "args": [], 
+                "kargs": {}
+            }, 
+            "calleeId": 1, 
+            "funcName": "critical_function", 
+            "id": 2, 
+            "level": 0, 
+            "methodType": "method", 
+            "returnedObject": 6, 
+            "threwException": false
+        }, 
+        {
+            "arguments": {
+                "args": [], 
+                "kargs": {}
+            }, 
+            "calleeId": 1, 
+            "funcName": "critical_function", 
+            "id": 3, 
+            "level": 0, 
+            "methodType": "method", 
+            "returnedObject": 6, 
+            "threwException": false
+        }, 
+        {
+            "arguments": {
+                "args": [
+                    3, 
+                    8
+                ], 
+                "kargs": {}
+            }, 
+            "calleeId": 3, 
+            "funcName": "important_function", 
+            "id": 4, 
+            "level": 0, 
+            "methodType": "method", 
+            "returnedObject": 6, 
+            "threwException": false
+        }
+    ], 
+    "language": "Python", 
+    "languageObjects": [
+        {
+            "declarationCode": "__main__", 
+            "declarationType": "FIXED_VALUE", 
+            "id": 1, 
+            "languageTypeId": 1, 
+            "parentId": 0
+        }, 
+        {
+            "declarationCode": "__main__.ImportantClass", 
+            "declarationType": "FIXED_VALUE", 
+            "id": 2, 
+            "languageTypeId": 2, 
+            "parentId": 1
+        }, 
+        {
+            "declarationCode": null, 
+            "declarationType": "CONSTRUCTOR", 
+            "id": 3, 
+            "languageTypeId": 3, 
+            "parentId": 2
+        }, 
+        {
+            "declarationCode": "__builtin__", 
+            "declarationType": "FIXED_VALUE", 
+            "id": 4, 
+            "languageTypeId": 1, 
+            "parentId": 0
+        }, 
+        {
+            "declarationCode": "NoneType", 
+            "declarationType": "FIXED_VALUE", 
+            "id": 5, 
+            "languageTypeId": 2, 
+            "parentId": 4
+        }, 
+        {
+            "declarationCode": null, 
+            "declarationType": "FIXED_VALUE", 
+            "id": 6, 
+            "languageTypeId": 3, 
+            "parentId": 5
+        }, 
+        {
+            "declarationCode": "int", 
+            "declarationType": "FIXED_VALUE", 
+            "id": 7, 
+            "languageTypeId": 2, 
+            "parentId": 4
+        }, 
+        {
+            "declarationCode": 5, 
+            "declarationType": "FIXED_VALUE", 
+            "id": 8, 
+            "languageTypeId": 3, 
+            "parentId": 7
+        }
+    ], 
+    "languageTypes": [
+        {
+            "id": 0, 
+            "name": "None"
+        }, 
+        {
+            "id": 1, 
+            "name": "Module"
+        }, 
+        {
+            "id": 2, 
+            "name": "Class"
+        }, 
+        {
+            "id": 3, 
+            "name": "Instance"
+        }
+    ]
+}
+```
+
 ##Implementation
 
 It uses:
