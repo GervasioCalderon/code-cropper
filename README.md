@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
 If we want to isolate only the important functions and classes, code_cropper is the solution:
 
-```
+```python
 import sys
 import code_cropper.annotator
 import code_cropper.code_generator
@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
 Output for the sample is this:
 
-```
+```python
 This class is important.
 LOL
 LOL
