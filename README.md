@@ -4,7 +4,7 @@ Code Cropper is an open-source software tool that extracts behavior from live Py
 
 ##Example
 
-We have this program in Python
+We have this program in Python:
 
 ```python
 def launchGUI():
@@ -168,7 +168,7 @@ if __name__ == '__main__':
 ```
 
 Id est: the equivalent code could be sent to a new Python file to:
- * analyzed the parameters;
+ * analyze the parameters;
  * simplify the original code;
  * generate an automatic Unit Test.
 
