@@ -28,7 +28,7 @@ def myPrint( str ):
     pass
 
 class AnnotatorTestCase(unittest.TestCase):
-    importMyFunctionsStr ="import MyFunctions\n\n"
+    importMyFunctionsStr ="import tests.MyFunctions\n\n"
     
     def setUp(self):
         unittest.TestCase.setUp(self)
@@ -41,7 +41,7 @@ class AnnotatorTestCase(unittest.TestCase):
             a.annotate( MyFunctions,  "noParamsFunction" )
         def codeToRun():
             MyFunctions.noParamsFunction()
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.noParamsFunction()\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.noParamsFunction()\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
    
     def testOneIntegerFunction(self):
@@ -49,7 +49,7 @@ class AnnotatorTestCase(unittest.TestCase):
             a.annotate( MyFunctions,  "add" )
         def codeToRun():
             MyFunctions.add(4,5)
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.add(4, 5)\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.add(4, 5)\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
 
     def testTwoIntegerFunctions(self):
@@ -59,7 +59,7 @@ class AnnotatorTestCase(unittest.TestCase):
         def codeToRun():
             MyFunctions.add(4,5)
             MyFunctions.subtract(4,5)
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.add(4, 5)\nMyFunctions.subtract(4, 5)\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.add(4, 5)\ntests.MyFunctions.subtract(4, 5)\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
 
     def testAllModuleFunctions(self):
@@ -68,7 +68,7 @@ class AnnotatorTestCase(unittest.TestCase):
         def codeToRun():
             MyFunctions.noParamsFunction()
             z = MyFunctions.add( 1, 2 )
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.noParamsFunction()\nMyFunctions.add(1, 2)\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.noParamsFunction()\ntests.MyFunctions.add(1, 2)\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
     
     def testGeneratedCodeIsStandarized(self):
@@ -77,7 +77,7 @@ class AnnotatorTestCase(unittest.TestCase):
         def codeToRun():
             MyFunctions.   add  (  4,  5  )
         #Generated should have a standard format, with no spaces 
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.add(4, 5)\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.add(4, 5)\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
 
     def testNonAnnotatedCodeIsSkipped(self):
@@ -93,7 +93,7 @@ class AnnotatorTestCase(unittest.TestCase):
             myPrint( "On the Internet nobody knows you're a dog." )
 
         #Non annotated code, like the print, should be skipped. Only "add" and "subtract" 
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.add(4, 5)\nMyFunctions.subtract(4, 5)\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.add(4, 5)\ntests.MyFunctions.subtract(4, 5)\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
         
     def testInnerFunctionIsNotCalled(self):
@@ -104,7 +104,7 @@ class AnnotatorTestCase(unittest.TestCase):
             MyFunctions.outerFunction()
 
         #Non annotated code, like the print, should be skipped. Only "add" and "subtract" 
-        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "MyFunctions.outerFunction()\n"
+        expectedStr = AnnotatorTestCase.importMyFunctionsStr + "tests.MyFunctions.outerFunction()\n"
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr )
 
     def testAnnotatedObjectAllMethods(self):
@@ -121,9 +121,9 @@ class AnnotatorTestCase(unittest.TestCase):
             myDict = {'x': 1, 'y': 2}
             foo.f3(myList)
             foo.f4(myDict,None)
-        expectedStr = """import MyFunctions
+        expectedStr = """import tests.MyFunctions
 
-var0 = MyFunctions.MyClass()
+var0 = tests.MyFunctions.MyClass()
 var0 = var0.f1()
 var0.f2(5)
 var2 = [5]
@@ -153,9 +153,9 @@ var0.f4(var3, None)
             foo.f3(myList)
             foo.f4(myDict,None)
             foo.f5(myList,myDict2)
-        expectedStr = """import MyFunctions
+        expectedStr = """import tests.MyFunctions
 
-var0 = MyFunctions.MyClass()
+var0 = tests.MyFunctions.MyClass()
 var0 = var0.f1()
 var0.f2(5)
 var2 = [5]
@@ -187,9 +187,9 @@ var0.f5(var2, var9)
             foo.setY(10)
             myPrint( "Get rid of the warnings ;) " + repr(cls) + repr(x + y) )
 
-        expectedStr = """import MyFunctions
+        expectedStr = """import tests.MyFunctions
 
-var0 = MyFunctions.ClassWithConstructor(1, 2)
+var0 = tests.MyFunctions.ClassWithConstructor(1, 2)
 var0.getX()
 var0.setX(5)
 var0.getY()
@@ -208,10 +208,10 @@ var0.setY(10)
             cls.static0()
             cls.static1(5)
 
-        expectedStr = """import MyFunctions
+        expectedStr = """import tests.MyFunctions
 
-MyFunctions.ClassWithStaticAndClassMethods.static0()
-MyFunctions.ClassWithStaticAndClassMethods.static1(5)
+tests.MyFunctions.ClassWithStaticAndClassMethods.static0()
+tests.MyFunctions.ClassWithStaticAndClassMethods.static1(5)
 """
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr, createObj )
 
@@ -226,10 +226,10 @@ MyFunctions.ClassWithStaticAndClassMethods.static1(5)
             cls.classMethod0()
             cls.classMethod1(5)
 
-        expectedStr = """import MyFunctions
+        expectedStr = """import tests.MyFunctions
 
-MyFunctions.ClassWithStaticAndClassMethods.classMethod0()
-MyFunctions.ClassWithStaticAndClassMethods.classMethod1(5)
+tests.MyFunctions.ClassWithStaticAndClassMethods.classMethod0()
+tests.MyFunctions.ClassWithStaticAndClassMethods.classMethod1(5)
 """
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr, createObj )
 
@@ -245,10 +245,10 @@ MyFunctions.ClassWithStaticAndClassMethods.classMethod1(5)
             foo = cls()
             foo.f1(p)
         expectedStr = """from code_cropper import dummy
-import MyFunctions
+import tests.MyFunctions
 
-var0 = MyFunctions.ClassWithDummyParameters()
-var0.f1(dummy.Dummy('MyFunctions.NonAnnotatedClass'))
+var0 = tests.MyFunctions.ClassWithDummyParameters()
+var0.f1(dummy.Dummy('tests.MyFunctions.NonAnnotatedClass'))
 """
         self.__testAnnotatorFunction( codeToRun, annotate, expectedStr, createObj )
 
@@ -264,7 +264,7 @@ var0.f1(dummy.Dummy('MyFunctions.NonAnnotatedClass'))
                 print str(e)
 
         expectedStr = '''import unittest
-import MyFunctions
+import tests.MyFunctions
 
 class UNIT_TEST_CASE(unittest.TestCase):
     def setUp(self):
@@ -274,8 +274,8 @@ class UNIT_TEST_CASE(unittest.TestCase):
         unittest.TestCase.tearDown(self)
 
     def test_main(self):
-        self.assertEquals(1, MyFunctions.func1())
-        self.assertRaises(MyFunctions.MyException, MyFunctions.func2)
+        self.assertEquals(1, tests.MyFunctions.func1())
+        self.assertRaises(tests.MyFunctions.MyException, tests.MyFunctions.func2)
 
 if __name__ == '__main__':
     unittest.main()'''

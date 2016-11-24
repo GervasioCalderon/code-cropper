@@ -1,2 +1,32 @@
 # IDE project settings
 .idea/*
+
+# Compiled files
+*.pyc
+*.pyo
+*.so
+*.o
+*.c
+
+
+#Temporary files
+.swp
+.dump
+.dump.gz
+coverage/
+.coverage
+.cover
+.eggs
+TEST-.*\.xml
+~
+*.swp
+*.swo
+
+#Edit/merge tools backup files
+*.orig
+
+# Package
+env/
+build/
+dist/
+*.egg-info/
