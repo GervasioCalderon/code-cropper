@@ -326,7 +326,6 @@ It uses:
 ##Future work
 
 This is the remaining work:
- * generate an egg;
  * kill the annotator thread in case of exceptions;
  * make it work for classes inhereted from Object;
  * test with heavy load.
