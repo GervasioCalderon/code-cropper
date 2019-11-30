@@ -17,7 +17,7 @@
 '''
 Base classes and functions for "Code Cropper"
 '''
-class AnnotationState:
+class AnnotationState(object):
     '''
     Annotation state for a function, class or file.
     '''

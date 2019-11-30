@@ -33,7 +33,7 @@ from serialization import CallGraphSerializer
 from serialization import fromJsonString
 from serialization import asJsonString
 
-class AuxiliarClassForDummy:
+class AuxiliarClassForDummy(object):
     '''
     A wrapper for a class, to have a "Dummy" object.
     '''
@@ -64,13 +64,13 @@ def getClassStringForDummy(obj):
     '''
     return obj.getClassString() if isinstance(obj, AuxiliarClassForDummy) else obj.__class__
 
-class GeneratedSourceType:
+class GeneratedSourceType(object):
     '''
     Type of result source file to generate.
     '''
     MAIN_FILE, MAIN_FILE_WITH_ASSERTS, UNIT_TEST = range(3) 
 
-class TokensGenerator:
+class TokensGenerator(object):
     '''
     Get source code tokens from a ProgramExecution.
     Abstract interface: implement one per language.
@@ -80,7 +80,7 @@ class TokensGenerator:
     CLASS_NAME_PREFIX = "cls"
     MAX_LENGTH_FOR_NOT_DECLARING = 50
 
-    class VariableInfo:
+    class VariableInfo(object):
         '''
         Information for the variables.
         '''
@@ -701,10 +701,7 @@ if __name__ == '__main__':
             return 'True' if myObj else 'False'
         if objType in (types.IntType, types.LongType, types.FloatType, types.StringType, types.UnicodeType):
             return repr(myObj)
-        if objType is types.InstanceType:
-            return "dummy.Dummy('" + getClassStringForDummy(myObj) + "')"
-        raise RuntimeError('Unsupported object type' + str(objType))
-        return declarationCode 
+        return "dummy.Dummy('" + getClassStringForDummy(myObj) + "')"
 
     ##
     # @param self The PythonTokensGenerator instance.
@@ -1201,7 +1198,7 @@ class CppTokensGenerator(TokensGenerator):
         return ";"
 
 
-class TokensGeneratorFactory:
+class TokensGeneratorFactory(object):
     '''
     Factory pattern to create a TokensGenerator, based on the programming language.
     '''
@@ -1238,7 +1235,7 @@ def _mustUseDummy(functionCalls):
                 useDummy = True
     return useDummy
 
-class CodeGenerator:
+class CodeGenerator(object):
     '''
     Generates an equivalent program, or unit test,
     starting from a Json database.

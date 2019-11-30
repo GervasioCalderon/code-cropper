@@ -17,7 +17,7 @@
 '''
 Python language related stuff.
 '''
-class PythonConstants:
+class PythonConstants(object):
     '''
     Constants for Python language.
     '''
