@@ -40,6 +40,9 @@ from call_graph import Argument
 from serialization import CallGraphSerializer
 from python_language import PythonConstants
 
+
+OBJECT_METHODS = dir(object())
+
 ##
 # @param obj Python "object" (it may be a module, class, or instance) whose functions we're annotating.
 # @return None for modules, obj.__class__ for instances, obj if it's a class.
@@ -138,18 +141,18 @@ class AnnotatorThread(Thread):
     environment, because it uses Python threading queues.
     '''
     #Constants
-    class Containers:
+    class Containers(object):
         '''
         Type of container. Language Objects and Function Calls are stored separately.
         '''
         LANGUAGE_OBJECTS, FUNCTION_CALLS = range(2)
     
-    class QueueInfo:
+    class QueueInfo(object):
         '''
         Indices in the item data stored in the queue.
         Each one represents different information for function calls.
         '''
-        class MessageTypes:
+        class MessageTypes(object):
             '''
             Type of queue message.
             '''
@@ -424,7 +427,7 @@ class AnnotatorThread(Thread):
         '''
         return objType != LanguageType.MODULE
     
-class Annotator:
+class Annotator(object):
     '''
     Interface for the calling programmer code to annotate the functions, i.e.:
     replace them with a similar code that stores the function call in a container,
@@ -460,7 +463,8 @@ class Annotator:
         else:
             objDict = inspect.getmembers(obj,inspect.isroutine)
             for name, _ in objDict:
-                self._annotateMethod(obj,name)
+                if name not in OBJECT_METHODS or name == '__init__':
+                    self._annotateMethod(obj,name)
 
     ##
     # @param self The Annotator instance.
@@ -629,7 +633,7 @@ class Annotator:
         with open(dumpFileName, 'w') as jsonFileOut:
             aSerializer.dump(self.programExecution_, jsonFileOut)
 
-class Annotation:
+class Annotation(object):
     '''
     RAII idiom implemented with the 'with' statement.
     It represents an annotation for a function call.
@@ -737,7 +741,7 @@ def annotatorInstance():
     '''
     return annotatorInstance_
 
-class ProgramExecutionDumper:
+class ProgramExecutionDumper(object):
     '''
     RAII idiom implemented with the 'with' statement.
     In the __enter__() point, it tells the annotator instance to enter the annotations process,
