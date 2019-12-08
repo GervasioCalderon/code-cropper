@@ -42,7 +42,7 @@ class InvalidParentException(Exception):
         '''
         return "'" + LanguageType.asString(self.parentLanguageType_) + "' is not a valid parent language type for '" + LanguageType.asString(self.childLanguageType_) + "'!" 
 
-class LanguageType:
+class LanguageType(object):
     '''
     It represents which language element an object belongs to.
     Python objects do have a hierarchical structure:
@@ -80,7 +80,7 @@ class LanguageType:
         assert childLanguageType != LanguageType.NONE
         return (parentLanguageType == LanguageType.NONE and childLanguageType == LanguageType.MODULE) or parentLanguageType == childLanguageType - 1
 
-class LanguageObject:
+class LanguageObject(object):
     '''
     KEY CLASS. It represents a Python "object" (it may be a module, class, or instance) whose functions we're annotating.
     EVERY OBJECT is declared as a LanguageObject. For instance, if we find the object "number 5", these are the new LanguageObject's to declare:
@@ -88,7 +88,7 @@ class LanguageObject:
     * int class.
     * 5.
     '''
-    class DECLARATION_TYPES:
+    class DECLARATION_TYPES(object):
         '''
         It indicates how to declare the object. It may be:
             * CONSTRUCTOR: object will be declared with a constructor syntax ( var1 = MyClass() )
@@ -167,11 +167,11 @@ class LanguageObject:
         '''
         return self.parent_
 
-class Argument:
+class Argument(object):
     '''
     Represents a function argument.
     '''
-    class ArgumentType:
+    class ArgumentType(object):
         '''
         Type of argument.
         '''
@@ -229,11 +229,11 @@ class Argument:
         '''
         return self.isConst_
 
-class FunctionCall:
+class FunctionCall(object):
     '''
     Class that represents a Function Call in the original program.
     '''
-    class MethodType:
+    class MethodType(object):
         '''
         'code_cropper' method type for a function.
         Some of these constants come from "inspect" module
@@ -390,13 +390,13 @@ class DuplicatedLanguageObjectIdException(Exception):
         '''
         return "Duplicated LanguageObject id: " + str(self.id_) 
 
-class ProgramExecution:
+class ProgramExecution(object):
     '''
     It represents a program execution, i.e.: the call graph and all the objects being used
     in the functions.
     '''
     MIN_LEVEL = 0
-    class Languages:
+    class Languages(object):
         '''
         Languages supported by "Code Cropper".
         '''

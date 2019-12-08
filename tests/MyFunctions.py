@@ -49,7 +49,7 @@ def outerFunction():
 def noParamsFunction():
     return MyClass()
 
-class MyClass:
+class MyClass(object):
     def f1(self):
         myPrint( "No params" )
         return self
@@ -66,14 +66,14 @@ class MyClass:
     def f5(self, obj1, obj2):
         myPrint("obj1: " + str(obj1) + ", obj2: " + str(obj2)) 
 
-class ClassWithDummyParameters:
+class ClassWithDummyParameters(object):
     def f1(self, d):
         myPrint( "Dummy parameter" )
         
-class NonAnnotatedClass:
+class NonAnnotatedClass(object):
     pass
 
-class ClassWithConstructor:
+class ClassWithConstructor(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -87,7 +87,7 @@ class ClassWithConstructor:
     def setY(self, y):
         self.y = y
         
-class ClassWithStaticAndClassMethods:
+class ClassWithStaticAndClassMethods(object):
     @staticmethod
     def static0():
         myPrint( "static0")

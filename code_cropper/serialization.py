@@ -72,11 +72,11 @@ class CallGraphLoadException(Exception):
         return self.msg_ 
 
 
-class CallGraphSerializer:
+class CallGraphSerializer(object):
     '''
     Serializes a Call Graph in a Json database, with the help of simplejson module.
     '''
-    class JSON:
+    class JSON(object):
         '''
         Json-related constants.
         '''
