@@ -19,7 +19,7 @@ Based on Null object, from Dinu C. Gherman, August 2001
 This is used for dummy parameters. It's better than None, because it does not throw exceptions when
 its methods are called.
 '''
-class Dummy:
+class Dummy(object):
     '''
     Dummy class to represent parameters that we don't know how to create.
     Unlike "None", it does not break after receiving a call: it just passes.
