@@ -287,25 +287,34 @@ if __name__ == '__main__':
         a = code_cropper.annotator.annotatorInstance()
         a.resetForNewAnnotations()
         obj = None
+
         if not createObjectCb is None:
             obj = createObjectCb()
             changeAnnotatorCb(a, obj)
         else:
             changeAnnotatorCb(a)
 
-        dumpFilePath = os.path.join(tempfile.gettempdir(), "call_graph.json")
-        with code_cropper.annotator.ProgramExecutionDumper(dumpFilePath, preserveOldDumpFiles = False) as codeCropperDumper:
+        def run_code():
             if not createObjectCb is None:
                 codeToRun(obj)
             else:
                 codeToRun()
-        
-        #Just to check that the functions were correctly restored. No exceptions should be thrown.
-        if not createObjectCb is None:
-            codeToRun(obj)
-        else:
-            codeToRun()
-        
+
+        def run_annotated_code():
+            dumpFilePath = os.path.join(tempfile.gettempdir(), "call_graph.json")
+            with code_cropper.annotator.ProgramExecutionDumper(
+                    dumpFilePath,
+                    preserveOldDumpFiles=False
+            ):
+                run_code()
+            return dumpFilePath
+
+        dumpFilePath = run_annotated_code()
+        # These repetitions test that the original functions were correctly restored.
+        # No exceptions should be thrown.
+        run_annotated_code()
+        run_code()
+
         with open(dumpFilePath, 'r') as dumpFile:
             #Get equivalent program
             myCodeGenerator = code_cropper.code_generator.CodeGenerator(dumpFile)
