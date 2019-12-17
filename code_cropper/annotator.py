@@ -23,14 +23,11 @@ to persist it later in a Database.
 import sys
 import types
 import inspect
-import json
-from cStringIO import StringIO
 
 from threading import Thread
 from Queue import Queue
 
 import file_utils
-from serialization import CallGraphSerializer
 from serialization import asJsonString
 from call_graph import LanguageType
 from call_graph import LanguageObject
@@ -135,6 +132,15 @@ def _getLanguageType(obj):
         return LanguageType.CLASS
     return LanguageType.INSTANCE
 
+def is_instance(inst):
+    try:
+        cls = inst.__class__
+    except AttributeError:
+        return False
+    if hasattr(cls, '__class__'):
+        return ('__dict__' in dir(cls) or hasattr(cls, '__slots__'))
+    return False
+
 class AnnotatorThread(Thread):
     '''
     Thread class to annotate the functions. It may work in a multi-threaded
@@ -146,7 +152,7 @@ class AnnotatorThread(Thread):
         Type of container. Language Objects and Function Calls are stored separately.
         '''
         LANGUAGE_OBJECTS, FUNCTION_CALLS = range(2)
-    
+
     class QueueInfo(object):
         '''
         Indices in the item data stored in the queue.
@@ -181,7 +187,7 @@ class AnnotatorThread(Thread):
         self.nextIdsMap_[AnnotatorThread.Containers.LANGUAGE_OBJECTS] = 1
         self.nextIdsMap_[AnnotatorThread.Containers.FUNCTION_CALLS] = 1
         self.annotationIdToFuncCall_ = {}
-        self.pythonIdToLanguageObjectId_ = {} 
+        self.pythonIdToLanguageObjectId_ = {}
         self.programExecution_ = aProgramExecution
         self.callGraphQueue_ = callGraphQueue
         self.currentFunctionLevel_ = ProgramExecution.MIN_LEVEL - 1
@@ -281,11 +287,11 @@ class AnnotatorThread(Thread):
                 hence: were we to use id() to identify objects, arguments for annotatedFunction() from the first and second call to f()
                 may be recognized as different, when they are logically the same.
             '''
-            if objType is types.InstanceType:
+            if is_instance(obj):
                 return "ID:" + str(id(obj))
             else:
                 return "ST:" + str(obj)
-            
+
         objToDeclare = obj
         objType = type(obj)
         if objType is types.TupleType:
@@ -317,7 +323,7 @@ class AnnotatorThread(Thread):
         #obj
         objType = _getLanguageType(obj)
         declarationType, declarationCode = self._getDeclarationInfo(pythonId, objToDeclare, objType, isCallee)
-        
+
         parentLo = None
         if self._hasParent(obj, objType):
             parent = self._getParent(obj, objType)
@@ -602,6 +608,9 @@ class Annotator(object):
                     #Otherwise, it'll remain unbouned, and get this annoying message:
                     #"TypeError: unbound method newFunction() must be called with ... instance as first argument (got nothing instead)"
                     oldFun = staticmethod( oldFun )
+                elif methodType == 'class method':
+                    # Similar issue, with class methods
+                    oldFun = classmethod(oldFun.__func__)
 
                 setattr(obj, funcName, oldFun )
             except Exception, e:
