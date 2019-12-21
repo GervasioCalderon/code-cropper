@@ -625,12 +625,6 @@ if __name__ == '__main__':
             self.indentation_ = self.initSpaces_
             testCaseName = self.projectName_.replace(' ', '_') + 'Test' if self.projectName_ else "UNIT_TEST_CASE"
             return """class %s(unittest.TestCase):
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-
     def test_main(self):
 """ % testCaseName
         return ""
