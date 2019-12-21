@@ -29,12 +29,6 @@ def myPrint( str ):
 
 class AnnotatorTestCase(unittest.TestCase):
     importMyFunctionsStr ="import tests.MyFunctions\n\n"
-    
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
 
     def testFunctionWithoutParams(self):
         def annotate( a ):
@@ -267,12 +261,6 @@ var0.f1(dummy.Dummy('tests.MyFunctions.NonAnnotatedClass'))
 import tests.MyFunctions
 
 class UNIT_TEST_CASE(unittest.TestCase):
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-
     def test_main(self):
         self.assertEquals(1, tests.MyFunctions.func1())
         self.assertRaises(tests.MyFunctions.MyException, tests.MyFunctions.func2)

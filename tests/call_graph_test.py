@@ -30,13 +30,6 @@ import cStringIO
 import unittest
 
 class CallGraphTestCase(unittest.TestCase):
-
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-
     def testLanguageType(self):
         self.assertEqual(LanguageType.asString(LanguageType.NONE), "None")
         self.assertEqual(LanguageType.asString(LanguageType.MODULE), "Module")

@@ -35,12 +35,6 @@ from code_cropper.serialization import asJsonString
 import unittest
 
 class CallGraphTestCase(unittest.TestCase):
-    
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
 
     def testSerialization(self):
         myProgramExecution = self.__createSampleProgramExecution__()
