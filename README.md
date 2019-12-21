@@ -1,8 +1,10 @@
-#Code Cropper
+# Code Cropper
 
-Code Cropper is an open-source software tool that extracts behavior from live Python running code, generating a program equivalent to the original, but only with the functions and/or classes selected by the user. It dumps the program execution as a Json database, to be extracted later with a code generator.
+Code Cropper is an open-source software tool that extracts behavior from live Python running code, generating a program/unit-test equivalent to the original, but only with the functions and/or classes selected by the user. It dumps the program execution as a Json database, to be extracted later with a code generator.
 
-##Example
+It can be used for automated generation of unit tests from real code execution, logging, and many other code-inspection use cases.
+
+## Example
 
 We have this program in Python:
 
@@ -17,14 +19,14 @@ def dummy_function():
 def critical_function():
     print 'WARNING! This is critical.'
 
-class ImportantClass:
+class ImportantClass(object):
     def __init__(self):
         print 'This class is important.'
 
     def important_function(self, i):
         print 'This function is really important.'
 
-class DummyClass:
+class DummyClass(object):
     def __init__(self):
         print 'This class is just a joke.'
 
@@ -66,14 +68,14 @@ def dummy_function():
 def critical_function():
     print 'WARNING! This is critical.'
 
-class ImportantClass:
+class ImportantClass(object):
     def __init__(self):
         print 'This class is important.'
 
     def important_function(self, i):
         print 'This function is really important.'
 
-class DummyClass:
+class DummyClass(object):
     def __init__(self):
         print 'This class is just a joke.'
 
@@ -151,12 +153,6 @@ import unittest
 import __main__
 
 class UNIT_TEST_CASE(unittest.TestCase):
-    def setUp(self):
-        unittest.TestCase.setUp(self)
-
-    def tearDown(self):
-        unittest.TestCase.tearDown(self)
-
     def test_main(self):
         var0 = __main__.ImportantClass()
         self.assertEquals(None, __main__.critical_function())
@@ -172,7 +168,7 @@ Id est: the equivalent code could be sent to a new Python file to:
  * simplify the original code;
  * generate an automatic Unit Test.
 
-##Json database for running
+## Json database for running
 The Json database generated (in the example, file in "/tmp/my_running.json") contains all the information needed to reproduce the program execution. It uses a hierarchy module -> class -> function, and all these "objects" are represented in the Database, being the model normalized. Every object (a module, class or function) has a unique id, and it is registered only once. This is the Json generated from the example:
 
 ```json
@@ -182,154 +178,157 @@ The Json database generated (in the example, file in "/tmp/my_running.json") con
             "arguments": {
                 "args": [
                     3
-                ], 
+                ],
                 "kargs": {}
-            }, 
-            "calleeId": 3, 
-            "funcName": "__init__", 
-            "id": 1, 
-            "level": 0, 
-            "methodType": "constructor", 
-            "returnedObject": 6, 
+            },
+            "calleeId": 3,
+            "funcName": "__init__",
+            "id": 1,
+            "level": 0,
+            "methodType": "constructor",
+            "returnedObject": 6,
             "threwException": false
-        }, 
+        },
         {
             "arguments": {
-                "args": [], 
+                "args": [],
                 "kargs": {}
-            }, 
-            "calleeId": 1, 
-            "funcName": "critical_function", 
-            "id": 2, 
-            "level": 0, 
-            "methodType": "method", 
-            "returnedObject": 6, 
+            },
+            "calleeId": 1,
+            "funcName": "critical_function",
+            "id": 2,
+            "level": 0,
+            "methodType": "method",
+            "returnedObject": 6,
             "threwException": false
-        }, 
+        },
         {
             "arguments": {
-                "args": [], 
+                "args": [],
                 "kargs": {}
-            }, 
-            "calleeId": 1, 
-            "funcName": "critical_function", 
-            "id": 3, 
-            "level": 0, 
-            "methodType": "method", 
-            "returnedObject": 6, 
+            },
+            "calleeId": 1,
+            "funcName": "critical_function",
+            "id": 3,
+            "level": 0,
+            "methodType": "method",
+            "returnedObject": 6,
             "threwException": false
-        }, 
+        },
         {
             "arguments": {
                 "args": [
-                    3, 
+                    3,
                     8
-                ], 
+                ],
                 "kargs": {}
-            }, 
-            "calleeId": 3, 
-            "funcName": "important_function", 
-            "id": 4, 
-            "level": 0, 
-            "methodType": "method", 
-            "returnedObject": 6, 
+            },
+            "calleeId": 3,
+            "funcName": "important_function",
+            "id": 4,
+            "level": 0,
+            "methodType": "method",
+            "returnedObject": 6,
             "threwException": false
         }
-    ], 
-    "language": "Python", 
+    ],
+    "language": "Python",
     "languageObjects": [
         {
-            "declarationCode": "__main__", 
-            "declarationType": "FIXED_VALUE", 
-            "id": 1, 
-            "languageTypeId": 1, 
+            "declarationCode": "__main__",
+            "declarationType": "FIXED_VALUE",
+            "id": 1,
+            "languageTypeId": 1,
             "parentId": 0
-        }, 
+        },
         {
-            "declarationCode": "__main__.ImportantClass", 
-            "declarationType": "FIXED_VALUE", 
-            "id": 2, 
-            "languageTypeId": 2, 
+            "declarationCode": "__main__.ImportantClass",
+            "declarationType": "FIXED_VALUE",
+            "id": 2,
+            "languageTypeId": 2,
             "parentId": 1
-        }, 
+        },
         {
-            "declarationCode": null, 
-            "declarationType": "CONSTRUCTOR", 
-            "id": 3, 
-            "languageTypeId": 3, 
+            "declarationCode": null,
+            "declarationType": "CONSTRUCTOR",
+            "id": 3,
+            "languageTypeId": 3,
             "parentId": 2
-        }, 
+        },
         {
-            "declarationCode": "__builtin__", 
-            "declarationType": "FIXED_VALUE", 
-            "id": 4, 
-            "languageTypeId": 1, 
+            "declarationCode": "__builtin__",
+            "declarationType": "FIXED_VALUE",
+            "id": 4,
+            "languageTypeId": 1,
             "parentId": 0
-        }, 
+        },
         {
-            "declarationCode": "NoneType", 
-            "declarationType": "FIXED_VALUE", 
-            "id": 5, 
-            "languageTypeId": 2, 
+            "declarationCode": "NoneType",
+            "declarationType": "FIXED_VALUE",
+            "id": 5,
+            "languageTypeId": 2,
             "parentId": 4
-        }, 
+        },
         {
-            "declarationCode": null, 
-            "declarationType": "FIXED_VALUE", 
-            "id": 6, 
-            "languageTypeId": 3, 
+            "declarationCode": null,
+            "declarationType": "FIXED_VALUE",
+            "id": 6,
+            "languageTypeId": 3,
             "parentId": 5
-        }, 
+        },
         {
-            "declarationCode": "int", 
-            "declarationType": "FIXED_VALUE", 
-            "id": 7, 
-            "languageTypeId": 2, 
+            "declarationCode": "int",
+            "declarationType": "FIXED_VALUE",
+            "id": 7,
+            "languageTypeId": 2,
             "parentId": 4
-        }, 
+        },
         {
-            "declarationCode": 5, 
-            "declarationType": "FIXED_VALUE", 
-            "id": 8, 
-            "languageTypeId": 3, 
+            "declarationCode": 5,
+            "declarationType": "FIXED_VALUE",
+            "id": 8,
+            "languageTypeId": 3,
             "parentId": 7
         }
-    ], 
+    ],
     "languageTypes": [
         {
-            "id": 0, 
+            "id": 0,
             "name": "None"
-        }, 
+        },
         {
-            "id": 1, 
+            "id": 1,
             "name": "Module"
-        }, 
+        },
         {
-            "id": 2, 
+            "id": 2,
             "name": "Class"
-        }, 
+        },
         {
-            "id": 3, 
+            "id": 3,
             "name": "Instance"
         }
     ]
 }
 ```
 
-##Implementation
+## Implementation
 
 It uses:
  * metaprogramming libraries, such as inspect and types;
  * Json format for storing the call graph;
  * multithreading queues, to decouple calls to the original function from the call graph storing.
 
-##Future work
+## Future work
 
 This is the remaining work:
- * kill the annotator thread in case of exceptions;
- * make it work for classes inhereted from Object;
- * test with heavy load.
-
+ * migrate to Python 3;
+ * add lint/pep8 and fix all warnings;
+ * test with heavy load;
+ * use Kafka or similar methods to decouple the logging from the execution, making it less CPU/memory consuming;
+ * other small fixes/enhancements in https://github.com/GervasioCalderon/code-cropper/issues.
+ 
 And some ideas to improve its capabilities:
- * simplify the annotation invocations, for instance: annotate all classes and functions of a module recursively.
- * implement a mockyfier, reading from the Json file to mimic a previous execution.
+ * simplify the annotation invocations, for instance: annotate all classes and functions of a module recursively;
+ * implement a mockyfier, reading from the Json file to mimic a previous execution;
+ * add profiling capabilities.
