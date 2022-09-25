@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ class CallGraphTestCase(unittest.TestCase):
         fileName = os.path.join(tempfile.gettempdir(), "call_graph.json")
         
         with open(fileName, "w") as fp:
-            aSerializer.dump( myProgramExecution, fp)
+            aSerializer.dump(myProgramExecution, fp)
             
         with open(fileName, "r") as fp:
             loadedProgramExecution = aSerializer.load(fp)
@@ -81,12 +81,12 @@ class CallGraphTestCase(unittest.TestCase):
     
     def __compareLanguageObjects(self, obj1, obj2):
         bothNone = obj1 is None and obj2 is None
-        self.assertTrue(bothNone or obj1.getId() == obj2.getId() )
+        self.assertTrue(bothNone or obj1.getId() == obj2.getId())
 
         
     def __compareProgramExecutions__(self, programExec1, programExec2):
         #Compare languages
-        self.assertEquals(programExec1.getLanguage(), programExec2.getLanguage())
+        self.assertEqual(programExec1.getLanguage(), programExec2.getLanguage())
 
         #Compare LanguageObjects
         langObjects1 = programExec1.getLanguageObjects()
@@ -98,13 +98,13 @@ class CallGraphTestCase(unittest.TestCase):
         langObjectKeys2 = deepcopy(langObjects2)
         
         for id, langObject in langObjects1.items():
-            self.assertTrue(langObjectKeys2.has_key(id))
+            self.assertTrue(id in langObjectKeys2)
             langObject2 = langObjects2[id]
             self.__compareLanguageObjects(langObject, langObject2)
             del langObjectKeys2[id]
 
         #Ensure both containers have the same size
-        self.assertTrue( not langObjectKeys2 )
+        self.assertTrue(not langObjectKeys2)
 
         #Compare CallGraph's
         calls = programExec1.getFunctionCalls()
@@ -112,7 +112,7 @@ class CallGraphTestCase(unittest.TestCase):
            
         #Compare calls array. Order is important, so we assume it's possible to compare element by element
         length = len(calls)
-        self.assertEquals(length, len(calls2))
+        self.assertEqual(length, len(calls2))
         for i in range(length):
             call1 = calls[i]
             call2 = calls2[i]
@@ -128,7 +128,7 @@ class CallGraphTestCase(unittest.TestCase):
             
             #This is similar to calls array. Order does matter, so we assume it's possible to compare element by element
             argsLenght = len(argsList1)
-            self.assertEquals(argsLenght, len(argsList2))
+            self.assertEqual(argsLenght, len(argsList2))
             for j in range(argsLenght):
                 self.__compareLanguageObjects(argsList1[j].getLanguageObject(), argsList2[j].getLanguageObject())
                 self.assertEqual(argsList1[j].getName(), argsList2[j].getName())
@@ -152,7 +152,7 @@ class CallGraphTestCase(unittest.TestCase):
                 parent1 = langObject1.getParent()
                 parent2 = langObject2.getParent()
                 bothNone = parent1 is None and parent2 is None
-                self.assertTrue(bothNone or parent1.getId() == parent2.getId() )
+                self.assertTrue(bothNone or parent1.getId() == parent2.getId())
 
 if __name__ == '__main__':
     unittest.main()

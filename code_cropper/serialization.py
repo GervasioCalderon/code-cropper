@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,28 +14,21 @@
 # SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
+"""
 Module that serializes/deserializes a Call Graph into a Json database.
 It uses simplejson library.
-'''
-import types
-from cStringIO import StringIO
+"""
+from io import StringIO
 import json
-from call_graph import LanguageType
-from call_graph import LanguageObject
-from call_graph import InvalidParentException
-from call_graph import Argument
-from call_graph import FunctionCall
-from call_graph import DuplicatedLanguageObjectIdException
-from call_graph import ProgramExecution
+from .call_graph import Argument, FunctionCall, LanguageObject, LanguageType, ProgramExecution
 
 ##
 # @param obj Python object to dump.
 # @return The Json representation for this object.
 def asJsonString(obj):
-    '''
+    """
     Get the Json representation for this object.
-    '''
+    """
     io = StringIO()
     json.dump(obj, io, sort_keys=True, indent=CallGraphSerializer.JSON.INDENT)
     return io.getvalue()
@@ -44,42 +37,42 @@ def asJsonString(obj):
 # @param str Json representation for an object.
 # @return The Python object whose Json representation is 'str' parameter.
 def fromJsonString(str):
-    '''
+    """
     Get the Python object correspondent to a Json representation.
-    '''
+    """
     return json.loads(str)
 
 
 class CallGraphLoadException(Exception):
-    '''
+    """
     Exception class for an error loading a Call Graph in memory.
-    '''
+    """
     ##
     # @param self The CallGraphLoadException instance to construct.
     # @param msg Exception's error message
     def __init__(self, msg):
-        '''
+        """
         Constructor.
-        '''
+        """
         self.msg_ = msg
 
     # @param self The CallGraphLoadException instance.
     # @return A string representation for the exception.
     def __str__(self):
-        '''
+        """
         String representation.
-        '''
+        """
         return self.msg_ 
 
 
-class CallGraphSerializer(object):
-    '''
+class CallGraphSerializer:
+    """
     Serializes a Call Graph in a Json database, with the help of simplejson module.
-    '''
-    class JSON(object):
-        '''
+    """
+    class JSON:
+        """
         Json-related constants.
-        '''
+        """
         #For json pretty-printing
         INDENT = 4
         
@@ -123,9 +116,9 @@ class CallGraphSerializer(object):
     # @param aProgramExecution A program Call Graph to dump.
     # @param fp File object where the Json database will be dumped.
     def dump(self, aProgramExecution, fp):
-        '''
+        """
         Dump a ProgramExecution in a Json database file.
-        '''
+        """
         progExecMap = self.__dumpProgramExecutionAsJsonMap(aProgramExecution)
         json.dump(progExecMap, fp, sort_keys=True, indent=CallGraphSerializer.JSON.INDENT)
 
@@ -134,9 +127,9 @@ class CallGraphSerializer(object):
     # @param fp File object where the Json database is stored.
     # @return A ProgramExecution (call graph) that represents the database previously stored in a Json database.
     def load(self, fp):
-        '''
+        """
         Load a ProgramExecution from a Json database file, and return it.
-        '''
+        """
         progExecMap = json.load(fp)
         return self.__loadProgramExecutionFromJsonMap(progExecMap)
 
@@ -145,18 +138,18 @@ class CallGraphSerializer(object):
     # @param aProgramExecution A program Call Graph to dump.
     # @return A "Json-compliant" Python dict with the ProgramExecution data. Storing it in a Json file is straight-forward.
     def __dumpProgramExecutionAsJsonMap(self, aProgramExecution):
-        '''
+        """
         Translate a ProgramExecution class to a "Json-compliant" format, i.e.:
         a Python dict (simplejson forces the object to dump to be a native type, not a custom class)
         with the same information.
-        '''
+        """
         ##
         # @param obj LanguageObject, or None
         # @return Obj's LanguageObject id, or 0 if obj is None.         
-        def getOptionalObjectId( obj ):
-            '''
+        def getOptionalObjectId(obj):
+            """
             Return LanguageObject id, or 0 if obj is None.
-            '''
+            """
             return 0 if obj is None else obj.getId()
 
         JSON = CallGraphSerializer.JSON
@@ -167,7 +160,7 @@ class CallGraphSerializer(object):
         ltArray = progExecMap[JSON.LANGUAGE_TYPES]
         myLanguageTypes = aProgramExecution.getLanguageTypes()
         for lt in myLanguageTypes:
-            ltArray.append( { JSON.ID: lt, JSON.NAME: LanguageType.asString( lt) } )
+            ltArray.append({ JSON.ID: lt, JSON.NAME: LanguageType.asString(lt) })
         
         langObjects = aProgramExecution.getLanguageObjects()
         progExecMap[JSON.LANGUAGE_OBJECTS] = []
@@ -222,18 +215,18 @@ class CallGraphSerializer(object):
     # @param progExecMap A Python dict with a call graph previously loaded from a Json database.
     # @return A newly-created ProgramExecution instance that represents the call graph stored in progExecMap.
     def __loadProgramExecutionFromJsonMap(self, progExecMap):
-        '''
+        """
         Load a new ProgramExecution class from a "Json-compliant" dict.
-        '''
+        """
         ##
         # @param aProgramExecution Program execution that holds the LanguageObject searched.
         # @id Id for the LanguageObject being serched (or 0 for a "None" object).
         # @return The LanguageObject searching for id, or None if id is 0.
-        def getLanguageObjectFromId(aProgramExecution, id ):
-            '''
+        def getLanguageObjectFromId(aProgramExecution, id):
+            """
             Return the LanguageObject searching for id, or None if id is 0.
-            '''
-            return None if id is 0 else aProgramExecution.getLanguageObjects()[id]
+            """
+            return None if id == 0 else aProgramExecution.getLanguageObjects()[id]
         
         JSON = CallGraphSerializer.JSON
         language = progExecMap[JSON.LANGUAGE]
@@ -263,9 +256,9 @@ class CallGraphSerializer(object):
             funcName = callMap[JSON.FUNC_NAME]
             methodType = callMap[JSON.METHOD_TYPE]
             level = callMap[JSON.LEVEL]
-            returnedObject = getLanguageObjectFromId(myProgramExecution, callMap[JSON.RETURNED_OBJECT] if callMap.has_key(JSON.RETURNED_OBJECT) else 0)
-            threwException = callMap[JSON.THREW_EXCEPTION] if callMap.has_key(JSON.THREW_EXCEPTION) else False 
-            totalTime = callMap[JSON.TOTAL_TIME] if callMap.has_key(JSON.TOTAL_TIME) else None
+            returnedObject = getLanguageObjectFromId(myProgramExecution, callMap[JSON.RETURNED_OBJECT] if JSON.RETURNED_OBJECT in callMap else 0)
+            threwException = callMap[JSON.THREW_EXCEPTION] if JSON.THREW_EXCEPTION in callMap else False
+            totalTime = callMap[JSON.TOTAL_TIME] if JSON.TOTAL_TIME in callMap else None
             
             args = callMap[JSON.ARGUMENTS][JSON.ARGS]
             argsList = []

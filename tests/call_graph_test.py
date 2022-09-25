@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,6 @@ from code_cropper.call_graph import FunctionCall
 from code_cropper.call_graph import DuplicatedLanguageObjectIdException
 from code_cropper.call_graph import ProgramExecution
 
-import cStringIO
 import unittest
 
 class CallGraphTestCase(unittest.TestCase):
@@ -51,11 +50,11 @@ class CallGraphTestCase(unittest.TestCase):
         
     def testLanguageObject(self):
         mod = LanguageObject(1, LanguageType.MODULE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "mod1.mod2")
-        self.assertEquals(mod.getId(), 1)
-        self.assertEquals(mod.getLanguageType(), LanguageType.MODULE)
-        self.assertEquals(mod.getDeclarationType(), LanguageObject.DECLARATION_TYPES.FIXED_VALUE)
-        self.assertEquals(mod.getDeclarationCode(), "mod1.mod2")
-        self.assertEquals(mod.getParent(), None)
+        self.assertEqual(mod.getId(), 1)
+        self.assertEqual(mod.getLanguageType(), LanguageType.MODULE)
+        self.assertEqual(mod.getDeclarationType(), LanguageObject.DECLARATION_TYPES.FIXED_VALUE)
+        self.assertEqual(mod.getDeclarationCode(), "mod1.mod2")
+        self.assertEqual(mod.getParent(), None)
         
         def moduleWithParentModule(mod):
             mod2 = LanguageObject(2, LanguageType.MODULE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "mod2", mod)
@@ -65,38 +64,38 @@ class CallGraphTestCase(unittest.TestCase):
         def parentlessClass():
             aClass = LanguageObject(3, LanguageType.CLASS, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "AClass")
         
-        self.assertRaises(InvalidParentException, parentlessClass )
+        self.assertRaises(InvalidParentException, parentlessClass)
         
         #Parent should be ok, no InvalidParentException raised
         aClass = LanguageObject(2, LanguageType.CLASS, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "AClass", mod)
         
-        self.assertEquals(aClass.getId(), 2)
-        self.assertEquals(aClass.getLanguageType(), LanguageType.CLASS)
-        self.assertEquals(aClass.getDeclarationType(), LanguageObject.DECLARATION_TYPES.FIXED_VALUE)
-        self.assertEquals(aClass.getDeclarationCode(), "AClass")
-        self.assertEquals(aClass.getParent(), mod)
+        self.assertEqual(aClass.getId(), 2)
+        self.assertEqual(aClass.getLanguageType(), LanguageType.CLASS)
+        self.assertEqual(aClass.getDeclarationType(), LanguageObject.DECLARATION_TYPES.FIXED_VALUE)
+        self.assertEqual(aClass.getDeclarationCode(), "AClass")
+        self.assertEqual(aClass.getParent(), mod)
         
         def instanceWithModuleParent(mod):
             anInstance = LanguageObject(3, LanguageType.INSTANCE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "'Gerva'", mod)
         
-        self.assertRaises(InvalidParentException, instanceWithModuleParent, mod )
+        self.assertRaises(InvalidParentException, instanceWithModuleParent, mod)
         
         #Class parent is ok for an instance
         anInstance = LanguageObject(3, LanguageType.INSTANCE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, '"Gerva"',  aClass)
         
-        self.assertEquals(anInstance.getId(), 3)
-        self.assertEquals(anInstance.getLanguageType(), LanguageType.INSTANCE)
-        self.assertEquals(anInstance.getDeclarationCode(), '"Gerva"')
-        self.assertEquals(anInstance.getParent(), aClass)
+        self.assertEqual(anInstance.getId(), 3)
+        self.assertEqual(anInstance.getLanguageType(), LanguageType.INSTANCE)
+        self.assertEqual(anInstance.getDeclarationCode(), '"Gerva"')
+        self.assertEqual(anInstance.getParent(), aClass)
     
     def testArgument(self):
         mod = LanguageObject(1, LanguageType.MODULE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "mod1.mod2")
         arg = Argument(mod)
-        self.assertEquals(arg.getLanguageObject(), mod)
-        self.assertEquals(arg.getName(), None)
+        self.assertEqual(arg.getLanguageObject(), mod)
+        self.assertEqual(arg.getName(), None)
         
         arg2 = Argument(mod, "Gerva")
-        self.assertEquals(arg2.getName(), "Gerva")
+        self.assertEqual(arg2.getName(), "Gerva")
         
     def testFunctionCall(self):
         start = time.time()
@@ -114,22 +113,22 @@ class CallGraphTestCase(unittest.TestCase):
         aCall = FunctionCall(1, mod, "fun", MT.METHOD, argsList, 1)
         aCall2 = FunctionCall(2, mod, "fun2", MT.METHOD, argsList, 2)
 
-        self.assertEquals(aCall.getId(), 1)
-        self.assertEquals(aCall.getCallee(), mod)
-        self.assertEquals(aCall.getFunctionName(), "fun")
-        self.assertEquals(aCall.getArgsList(), argsList)
-        self.assertEquals(aCall.getLevel(), 1)
-        self.assertEquals(aCall.getReturnedObject(), None)
-        self.assertEquals(aCall.threwException(), False)
-        self.assertEquals(aCall.getTotalTime(), None)
-        self.assertEquals(aCall2.getId(), 2)
+        self.assertEqual(aCall.getId(), 1)
+        self.assertEqual(aCall.getCallee(), mod)
+        self.assertEqual(aCall.getFunctionName(), "fun")
+        self.assertEqual(aCall.getArgsList(), argsList)
+        self.assertEqual(aCall.getLevel(), 1)
+        self.assertEqual(aCall.getReturnedObject(), None)
+        self.assertEqual(aCall.threwException(), False)
+        self.assertEqual(aCall.getTotalTime(), None)
+        self.assertEqual(aCall2.getId(), 2)
         
         finish = time.time()
         totalTime = finish - start
-        aCall3 = FunctionCall(3, mod, "fun3", MT.METHOD, argsList, 0, obj2, True, totalTime )
-        self.assertEquals(aCall3.getReturnedObject(), obj2)
-        self.assertEquals(aCall3.threwException(), True)
-        self.assertEquals(aCall3.getTotalTime(), totalTime)
+        aCall3 = FunctionCall(3, mod, "fun3", MT.METHOD, argsList, 0, obj2, True, totalTime)
+        self.assertEqual(aCall3.getReturnedObject(), obj2)
+        self.assertEqual(aCall3.threwException(), True)
+        self.assertEqual(aCall3.getTotalTime(), totalTime)
         
     def testProgramExecution(self):
         
@@ -141,7 +140,7 @@ class CallGraphTestCase(unittest.TestCase):
         self.assertEqual(LanguageType.CLASS, theLanguageTypes[LanguageType.CLASS])
         self.assertEqual(LanguageType.INSTANCE, theLanguageTypes[LanguageType.INSTANCE])
         
-        mod = LanguageObject(1, LanguageType.MODULE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "mod1.mod2.mod3" )
+        mod = LanguageObject(1, LanguageType.MODULE, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "mod1.mod2.mod3")
         myProgramExecution.addLanguageObject(mod)
         
         cls =  LanguageObject(2, LanguageType.CLASS, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, "Class1", mod)
@@ -175,19 +174,19 @@ class CallGraphTestCase(unittest.TestCase):
         myProgramExecution.addFunctionCall(aCall2)
         myProgramExecution.addFunctionCall(aCall3)
         
-        self.assertEquals( myProgramExecution.getLanguage(), "Python")
+        self.assertEqual(myProgramExecution.getLanguage(), "Python")
         theLanguageObejcts = myProgramExecution.getLanguageObjects()
         
-        self.assertEquals( theLanguageObejcts[1], mod)
-        self.assertEquals( theLanguageObejcts[2], cls)
-        self.assertEquals( theLanguageObejcts[3], obj)
-        self.assertEquals( theLanguageObejcts[4], obj2)
-        self.assertEquals( theLanguageObejcts[5], obj3)
+        self.assertEqual(theLanguageObejcts[1], mod)
+        self.assertEqual(theLanguageObejcts[2], cls)
+        self.assertEqual(theLanguageObejcts[3], obj)
+        self.assertEqual(theLanguageObejcts[4], obj2)
+        self.assertEqual(theLanguageObejcts[5], obj3)
         
         theCalls = myProgramExecution.getFunctionCalls()
-        self.assertEquals(theCalls[0], aCall)
-        self.assertEquals(theCalls[1], aCall2)
-        self.assertEquals(theCalls[2], aCall3)
+        self.assertEqual(theCalls[0], aCall)
+        self.assertEqual(theCalls[1], aCall2)
+        self.assertEqual(theCalls[2], aCall3)
 
 if __name__ == '__main__':
     unittest.main()

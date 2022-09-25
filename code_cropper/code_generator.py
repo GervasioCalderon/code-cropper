@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,76 +14,67 @@
 # SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
+"""
 Module to generate source code (a main program or a unit test) from
 a call graph.
-'''
+"""
 import types
-import json
-from dummy import Dummy
-from call_graph import LanguageType
-from call_graph import LanguageObject
-from call_graph import InvalidParentException
-from call_graph import Argument
-from call_graph import FunctionCall
-from call_graph import DuplicatedLanguageObjectIdException
-from call_graph import ProgramExecution
-from python_language import PythonConstants
-from serialization import CallGraphSerializer
-from serialization import fromJsonString
-from serialization import asJsonString
+from .call_graph import FunctionCall, LanguageObject, LanguageType, ProgramExecution
+from .python_language import PythonConstants
+from .serialization import fromJsonString, CallGraphSerializer
 
-class AuxiliarClassForDummy(object):
-    '''
+
+class AuxiliarClassForDummy:
+    """
     A wrapper for a class, to have a "Dummy" object.
-    '''
+    """
     ##
     # @param self The AuxiliarClassForDummy instance to construct.
     # @param classString String representation for the class.
     def __init__(self, classString):
-        '''
+        """
         Constructor.
-        '''
+        """
         self.classString_ = classString
 
     ##
     # @param self The AuxiliarClassForDummy instance.
     # @return The class string representation.     
     def getClassString(self):
-        '''
+        """
         Return the class string representation.
-        '''
+        """
         return self.classString_
     
 ##
 # @param obj The AuxiliarClassForDummy instance.
 # @return The class (as a string) for an object, or the wrapped class for an AuxiliarClassForDummy instance.
 def getClassStringForDummy(obj):
-    '''
+    """
     Get the class (as a string) for an object, or the wrapped class for an AuxiliarClassForDummy instance.
-    '''
+    """
     return obj.getClassString() if isinstance(obj, AuxiliarClassForDummy) else obj.__class__
 
-class GeneratedSourceType(object):
-    '''
+class GeneratedSourceType:
+    """
     Type of result source file to generate.
-    '''
+    """
     MAIN_FILE, MAIN_FILE_WITH_ASSERTS, UNIT_TEST = range(3) 
 
-class TokensGenerator(object):
-    '''
+class TokensGenerator:
+    """
     Get source code tokens from a ProgramExecution.
     Abstract interface: implement one per language.
-    '''
+    """
     INSTANCE_NAME_PREFIX = "var"
     MODULE_NAME_PREFIX = "mod"
     CLASS_NAME_PREFIX = "cls"
     MAX_LENGTH_FOR_NOT_DECLARING = 50
 
-    class VariableInfo(object):
-        '''
+    class VariableInfo:
+        """
         Information for the variables.
-        '''
+        """
         ##
         # @param self The VariableInfo instance to construct.
         # @param varName Variable name.
@@ -91,9 +82,9 @@ class TokensGenerator(object):
         # @param useVarNameForRepr If true, use the name to refer to the variable. Else (for instance: basic types), use a string representation.
         # @param pythonObject Python object representation.
         def __init__(self, varName, declarationType, useVarNameForRepr, pythonObject = None):
-            '''
+            """
             Constructor.
-            '''
+            """
             self.varName_ = varName
             self.declarationType_ = declarationType
             self.useVarNameForRepr_ = useVarNameForRepr
@@ -103,36 +94,36 @@ class TokensGenerator(object):
         # @param self The VariableInfo instance.
         # @return The variable name.
         def getVarName(self):
-            '''
+            """
             Get variable name.
-            '''
+            """
             return self.varName_
         
         ##
         # @param self The VariableInfo instance.
         # @return The variable declaration type.
         def getDeclarationType(self):
-            '''
+            """
             Get the variable declaration type (see LanguageObject.DECLARATION_TYPES).
-            '''
+            """
             return self.declarationType_
         
         ##
         # @param self The VariableInfo instance.
         # @return Whether or not we use the name to refer to the variable.
         def useVarNameForRepr(self):
-            '''
+            """
             Tell whether or not we use the name to refer to the variable.
-            '''
+            """
             return self.useVarNameForRepr_
 
         ##
         # @param self The VariableInfo instance
         # @return Python object representation.
         def getPythonObject(self):
-            '''
+            """
             Get Python object representation.
-            '''
+            """
             return self.pythonObject_
 
     ##
@@ -141,9 +132,9 @@ class TokensGenerator(object):
     # @param sourceType Kind of source to generate (see GeneratedSourceType).
     # @param projectName Code Cropper project name.
     def __init__(self, aProgramExecution, sourceType, projectName = None):
-        '''
+        """
         Constructor.
-        '''
+        """
         self.idsToVariableInfo_ = {}
         self.indentation_ = ""
         self.initSpaces_ = ""
@@ -156,9 +147,9 @@ class TokensGenerator(object):
     # @param str A Json string.
     # @return A Python object from its Json string representation.
     def fromJsonString_(self, str):
-        '''
+        """
         Get a Python object from its Json string representation.
-        '''
+        """
         return fromJsonString(str)
 
     ##
@@ -166,9 +157,9 @@ class TokensGenerator(object):
     # @param aLanguageObject Language object to search.
     # @return The variable info correspondent to a LanguageObject.
     def getVariableInfo(self, aLanguageObject):
-        '''
+        """
         Get the variable info correspondent to a LanguageObject.
-        '''
+        """
         assert self.languageObjectIsDeclared(aLanguageObject)
         return self.idsToVariableInfo_[aLanguageObject.getId()]
 
@@ -176,64 +167,64 @@ class TokensGenerator(object):
     # @param self The TokensGenerator instance.
     # @return Code to insert at the beginning of the generated file's main function.
     def beginMain(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file's main function.
-        '''
+        """
         return ""
 
     ##
     # @param self The TokensGenerator instance.
     # @return Code to insert at the end of the generated file's main function.
     def endMain(self):
-        '''
+        """
         Return code to insert at the end of the generated file's main function.
-        '''
+        """
         return ""
 
     ##
     # @param self The TokensGenerator instance.
     # @return One indentation string, according to the language state of art.
     def getOneIndentation_(self):
-        '''
+        """
         Get one indentation string, according to the language state of art.
-        '''
+        """
         return "\t"
 
     ##
     # @param self The TokensGenerator instance.
     # @param level The function nesting level (it starts with 0, and increases going deep).
     def newFunctionLevel(self, level):
-        '''
+        """
         A new function nesting level has been reached.
         This modifies the indentation for the ALL_LEVELS code generation.
-        '''
+        """
         self.indentation_ = self.getInitialSpaces() + self.getOneIndentation_() * level
 
     ##
     # @param self The TokensGenerator instance.
     # @return Initial spaces to insert in the current line.
     def getInitialSpaces(self):
-        '''
+        """
         Get initial spaces to insert in the current line.
-        '''
+        """
         return self.initSpaces_
 
     ##
     # @param self The TokensGenerator instance.
     # @return Code to insert at the beginning of the generated file.
     def initialFileCode(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file.
-        '''
+        """
         return ""
 
     ##
     # @param self The TokensGenerator instance.
     # @return Code to insert at the end of the generated file.
     def finalFileCode(self):
-        '''
+        """
         Return code to insert at the end of the generated file.
-        '''
+        """
         return ""
 
     ##
@@ -241,9 +232,9 @@ class TokensGenerator(object):
     # @param aLanguageObject A LanguageObject.
     # @return Whether or not the LanguageObject is already declared.
     def languageObjectIsDeclared(self, aLanguageObject):
-        '''
+        """
         Is the LanguageObject already declared?
-        '''
+        """
         return aLanguageObject.getId() in self.idsToVariableInfo_
 
     ##
@@ -251,13 +242,13 @@ class TokensGenerator(object):
     # @param aLanguageObject A LanguageObject.
     # @return Declaration code for an object, or "" if declared before.
     def declareLanguageObject(self, aLanguageObject):
-        '''
+        """
         Public declaration methods. VIRTUAL METHOD PATTERN: implement details in derivatives.
         Return the declaration code if the object needs to be declared,
         or an empty string otherwise.
-        '''
+        """
         declaration = ""
-        if not self.idsToVariableInfo_.has_key(aLanguageObject.getId()):
+        if not aLanguageObject.getId() in self.idsToVariableInfo_:
             myLanguageType = aLanguageObject.getLanguageType()
             if myLanguageType == LanguageType.MODULE:
                 varInfo = self._calculateModuleVariableInfo(aLanguageObject)
@@ -278,44 +269,44 @@ class TokensGenerator(object):
     # @myObj A Python object.
     # @return Whether or not we'll use name to refer to the variable
     def _mustUseVarNameForRepr(self, myObj):
-        '''
+        """
         Tell whether or not we'll use name to refer to the variable. Else (for instance: basic types), use a string representation.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
     # @param myObj A Python object.
     # @return Declaration code for this object.
     def _getDeclarationCodeFromObject(self, myObj):
-        '''
+        """
         Get the declaration code for this object.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
     # @param moduleObject A Module object.
     # @return The VariableInfo for this module.
     def _calculateModuleVariableInfo(self, moduleObject):
-        '''
+        """
         Create the VariableInfo for this module.
-        '''
+        """
         assert moduleObject.getLanguageType() == LanguageType.MODULE
         assert moduleObject.getDeclarationType() == LanguageObject.DECLARATION_TYPES.FIXED_VALUE
         modName = TokensGenerator.MODULE_NAME_PREFIX + str(self.nextModuleIndex_)
         self.nextModuleIndex_ += 1
         pythonObj = self.fromJsonString_(moduleObject.getDeclarationCode())
-        return TokensGenerator.VariableInfo(modName, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, False, pythonObj )
+        return TokensGenerator.VariableInfo(modName, LanguageObject.DECLARATION_TYPES.FIXED_VALUE, False, pythonObj)
  
     ##
     # @param self The TokensGenerator instance.
     # @param classObject A Class object.
     # @return The VariableInfo for this class.
     def _calculateClassVariableInfo(self, classObject):
-        '''
+        """
         Create the VariableInfo for this class.
-        '''  
+        """  
         assert classObject.getLanguageType() == LanguageType.CLASS
         assert classObject.getDeclarationType() == LanguageObject.DECLARATION_TYPES.FIXED_VALUE
         className = TokensGenerator.CLASS_NAME_PREFIX + str(self.nextClassIndex_)
@@ -329,9 +320,9 @@ class TokensGenerator(object):
     # @param instanceObject Instance object.
     # @return The VariableInfo for this instance.
     def _calculateInstanceVariableInfo(self, instanceObject):
-        '''
+        """
         Create the VariableInfo for this instance.
-        '''
+        """
         assert instanceObject.getLanguageType() == LanguageType.INSTANCE
         instanceName = TokensGenerator.INSTANCE_NAME_PREFIX + str(self.nextInstanceIndex_)
         self.nextInstanceIndex_ += 1
@@ -367,20 +358,20 @@ class TokensGenerator(object):
     # @param moduleInfo Module information (see VariableInfo).
     # @return The module declaration code, or an empty string if the class is already declared.
     def _declareModule(self, moduleInfo):
-        '''
+        """
         Declare a module, if not declared before.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
     
     ##
     # @param self The TokensGenerator instance.
     # @param classInfo Class information (see VariableInfo).
     # @return The class declaration code, or an empty string if the class is already declared.
     def _declareClass(self, classInfo):
-        '''
+        """
         Declare a class, if not declared before.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
     
     ##
     # @param self The TokensGenerator instance.
@@ -388,10 +379,10 @@ class TokensGenerator(object):
     # @param myType Type of the instance to declare.
     # @return The instance declaration code, or an empty string if the class is already declared.
     def _declareInstance(self, instanceInfo, myType = ""):
-        '''
+        """
         Declare an instance, if not declared before.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
@@ -399,19 +390,19 @@ class TokensGenerator(object):
     # @param firstCall First FunctionCall for this object.
     # @return Whether or not an object must be created with the default constructor.
     def mustDefaultConstruct(self, aLanguageObject, firstCall):
-        '''
+        """
         Tell whether or not an object must be created with the default constructor.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
     # @param aLanguageObject A LanguageObject.
     def defaultConstruct(self, aLanguageObject):
-        '''
+        """
         Call the object's default constructor.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
@@ -419,34 +410,34 @@ class TokensGenerator(object):
     # @param aCall A FunctionCall.
     # @return Whether or not the method is a constructor.
     def methodIsConstructor(self, aLanguageObject, aCall):
-        '''
+        """
         Tell whether or not the method is a constructor.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
     # @param aLanguageObject A LanguageObject.
     # @return Variable name or a fixed value, depending on the object declaration type.
     def getObjectRepresentation(self, aLanguageObject):
-        '''
+        """
         Return Variable name or a fixed value, depending on the object declaration type.
-        '''
-        assert self.idsToVariableInfo_.has_key(aLanguageObject.getId())
+        """
+        assert aLanguageObject.getId() in self.idsToVariableInfo_
         varInfo = self.idsToVariableInfo_[aLanguageObject.getId()]
         if varInfo.useVarNameForRepr():
             return varInfo.getVarName()
         else:
-            return self._getDeclarationCodeFromObject( varInfo.getPythonObject() )
+            return self._getDeclarationCodeFromObject(varInfo.getPythonObject())
 
     ##
     # @param self The TokensGenerator instance.
     # @param returnedObject If threwException is False, the object returned by the function. If True, the exception being raised.
     # @param threwException The function has raised an exception.
     def returnedObjectFunctionPrefix(self, returnedObject, threwException):
-        '''
+        """
         In Unit Tests, initial code for a line that checks the function return value.
-        '''
+        """
         return ''
 
     ##
@@ -454,9 +445,9 @@ class TokensGenerator(object):
     # @param returnedObject If threwException is False, the object returned by the function. If True, the exception being raised.
     # @param threwException The function has raised an exception.
     def returnedObjectFunctionPosfix(self, returnedObject, threwException):
-        '''
+        """
         In Unit Tests, final code for a line that checks the function return value.
-        '''
+        """
         return ''
 
     ##
@@ -464,10 +455,10 @@ class TokensGenerator(object):
     # @param aFunctionCall A FunctionCall.
     # @return Code for this function call, to be inserted in the generated source file.
     def methodCall(self, aFunctionCall):
-        '''
+        """
         Return code for this function call, to be inserted in the generated source file.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The TokensGenerator instance.
@@ -476,71 +467,71 @@ class TokensGenerator(object):
     # @param argCount Order in the arguments list for "arg".
     # @return If this argument must be skipped (for instance: "self" implicit argument in Python).
     def mustSkipArgument(self, aFunctionCall, arg, argCount):
-        '''
+        """
         Tell if this argument must be skipped (for instance: "self" implicit argument in Python).
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
         
     ##
     # @param self The PythonTokensGenerator instance.
     # @return The Dummy class declaration code.
     def declareDummyClass(self):
-        '''
+        """
         Declare Dummy class.
         Return its declaration code.
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
     ##
     # @param self The PythonTokensGenerator instance.
     # @return The Json module declaration code.
     def declareJsonModule(self):
-        '''
+        """
         Declare Json Module (simplejson library).
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
     
     ##
     # @param self The TokensGenerator instance.
     # @return The arguments list begin mark.
     def argumentsListBegin(self):
-        '''
+        """
         Get the arguments list begin mark.
-        '''        
+        """
         return "("
 
     ##
     # @param self The TokensGenerator instance.
     # @return The arguments list separator (',').
     def argumentsListSeparator(self):
-        '''
+        """
         Get the arguments list separator (',').
-        '''        
+        """
         return ", "
 
     ##
     # @param self The TokensGenerator instance.
     # @return The arguments list end mark.
     def argumentsListEnd(self):
-        '''
+        """
         Get the arguments list end mark.
-        '''
+        """
         return ")"
 
     ##
     # @param self The TokensGenerator instance.
     # @return the sentence ending.
     def endSentence(self):
-        '''
+        """
         Abstract method.
         Return the sentence ending (";" for C++, for example).
-        '''
-        raise NotImplementedError( "Should have implemented this" )
+        """
+        raise NotImplementedError("Should have implemented this")
 
 class PythonTokensGenerator(TokensGenerator):
-    '''
+    """
     Code generator for Python source files.
-    '''
+    """
     INSTANCE_NAME_PREFIX = "var"
     MODULE_NAME_PREFIX = "mod"
     CLASS_NAME_PREFIX = "cls"
@@ -553,9 +544,9 @@ class PythonTokensGenerator(TokensGenerator):
     # @param sourceType Kind of source to generate (see GeneratedSourceType).
     # @param projectName Code Cropper project name.
     def __init__(self, aProgramExecution, sourceType, projectName):
-        '''
+        """
         Constructor.
-        '''
+        """
         TokensGenerator.__init__(self, aProgramExecution, sourceType, projectName)
         self.nextModuleIndex_ = 0
         self.nextClassIndex_ = 0
@@ -566,13 +557,12 @@ class PythonTokensGenerator(TokensGenerator):
     # @param str A Json string.
     # @return a Python object from its Json string representation.
     def fromJsonString_(self, str):
-        '''
+        """
         Get a Python object from its Json string representation.
-        '''
+        """
         obj = TokensGenerator.fromJsonString_(self, str)
         #Fix bug in Json: for maps, keys are translated into strings
-        objType = type(obj)
-        if objType is types.DictType:
+        if isinstance(obj, dict):
             newDict = {}
             for key, value in obj.items():
                 newKey = int(key)
@@ -584,18 +574,18 @@ class PythonTokensGenerator(TokensGenerator):
     # @param self The PythonTokensGenerator instance.
     # @return One Python indentation string.
     def getOneIndentation_(self):
-        '''
+        """
         Get one Python indentation string.
-        '''
+        """
         return " " * PythonTokensGenerator.SPACES_PER_TAB
     
     ##
     # @param self The PythonTokensGenerator instance.
     # @return Code to insert at the beginning of the generated file.
     def initialFileCode(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file.
-        '''
+        """
         if self.sourceType_ == GeneratedSourceType.UNIT_TEST:
             return "import unittest\n"
         return ""
@@ -604,9 +594,9 @@ class PythonTokensGenerator(TokensGenerator):
     # @param self The PythonTokensGenerator instance.
     # @return Code to insert at the end of the generated file.
     def finalFileCode(self):
-        '''
+        """
         Return code to insert at the end of the generated file.
-        '''
+        """
         if self.sourceType_ == GeneratedSourceType.UNIT_TEST:
             return """
 if __name__ == '__main__':
@@ -617,9 +607,9 @@ if __name__ == '__main__':
     # @param self The PythonTokensGenerator instance.
     # @return Code to insert at the beginning of the generated file's main function.
     def beginMain(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file's main function.
-        '''         
+        """
         if self.sourceType_ == GeneratedSourceType.UNIT_TEST:
             self.initSpaces_ = self.getOneIndentation_() * 2
             self.indentation_ = self.initSpaces_
@@ -634,12 +624,12 @@ if __name__ == '__main__':
     # @param moduleInfo Module information (see VariableInfo)
     # @return The module declaration code, or an empty string if the class is already declared.
     def _declareModule(self, moduleInfo):
-        '''
+        """
         Declare a module, if not declared before.
-        '''
+        """
         moduleNameStr = self._getDeclarationCodeFromObject(moduleInfo.getPythonObject())
         moduleName = eval(moduleNameStr)
-        if moduleName == PythonConstants.BUILTINS_MODULE_NAME:
+        if moduleName in PythonConstants.BUILTINS_MODULE_NAMES:
             return "" 
         else:
             alias = " as " + moduleInfo.getVarName() if moduleInfo.useVarNameForRepr() else ""
@@ -650,9 +640,9 @@ if __name__ == '__main__':
     # @param classInfo Class information (see VariableInfo).    
     # @return The class declaration code, or an empty string if the class is already declared.
     def _declareClass(self, classInfo):
-        '''
+        """
         Declare a class, if not declared before.
-        '''
+        """
         return "" if not classInfo.useVarNameForRepr() else self.indentation_ + classInfo.getVarName() + " = " + self._getDeclarationCodeFromObject(classInfo.getPythonObject()) + "\n"
 
     ##
@@ -660,40 +650,36 @@ if __name__ == '__main__':
     # @myObj A Python object.
     # @return Whether or not we'll use name to refer to the variable.
     def _mustUseVarNameForRepr(self, myObj):
-        '''
+        """
         Tell whether or not we'll use name to refer to the variable. Else (for instance: basic types), use a string representation.
-        '''
+        """
         objType = type(myObj)
-        if objType is types.NoneType:
+        if myObj is None:
             return False
-        if objType is types.BooleanType:
+        if isinstance(myObj, bool):
             return False
-        if objType in (types.IntType, types.LongType, types.FloatType):
+        if isinstance(myObj, (bool, int, float,)):
             return False
-        if objType in (types.StringType, types.UnicodeType):
+        if isinstance(myObj, str):
             return len(myObj) > PythonTokensGenerator.MAX_LENGTH_FOR_NOT_DECLARING
-        if objType in (types.ListType, types.DictType):
+        if isinstance(myObj, (list, dict,)):
             #This is mandatory, since their construction is not trivial
             return True
-        if objType is types.InstanceType:
-            return False
-        raise RuntimeError('Unsupported object type' + str(objType))
-        return declarationCode
+        return False
 
     ##
     # @param self The PythonTokensGenerator instance.
     # @param myObj A Python object.
     # @return Declaration code for this object.
     def _getDeclarationCodeFromObject(self, myObj):
-        '''
+        """
         Get the declaration code for this object.
-        '''
-        objType = type(myObj)
-        if objType is types.NoneType:
+        """
+        if myObj is None:
             return 'None'
-        if objType is types.BooleanType:
+        if isinstance(myObj, bool):
             return 'True' if myObj else 'False'
-        if objType in (types.IntType, types.LongType, types.FloatType, types.StringType, types.UnicodeType):
+        if isinstance(myObj, (int, float, str,)):
             return repr(myObj)
         return "dummy.Dummy('" + getClassStringForDummy(myObj) + "')"
 
@@ -703,15 +689,14 @@ if __name__ == '__main__':
     # @param myType Type of the instance to declare.
     # @return The instance declaration code, or an empty string if the instance is already declared.
     def _declareInstance(self, instanceInfo, myType = ""):
-        '''
+        """
         Declare an instance, if not declared before.
-        '''
+        """
         mustDeclare = instanceInfo.getDeclarationType() != LanguageObject.DECLARATION_TYPES.CONSTRUCTOR and instanceInfo.useVarNameForRepr()
         if mustDeclare:
             myObj = instanceInfo.getPythonObject()
-            objType = type(myObj)
             #Tuples are translated to lists
-            if objType is types.ListType:
+            if isinstance(myObj, list):
                 declCode = self.indentation_ + instanceInfo.getVarName() + " = ["
                 childrenDeclCode = ""
                 for id in myObj:
@@ -723,7 +708,7 @@ if __name__ == '__main__':
                     declCode = declCode[:-2]
                 declCode += "]\n"
                 return childrenDeclCode + declCode
-            if objType is types.DictType:
+            if isinstance(myObj, dict):
                 declCode = self.indentation_ + instanceInfo.getVarName() + " = {}\n"
                 childrenDeclCode = ""
                 for key, value in myObj.items():
@@ -747,9 +732,9 @@ if __name__ == '__main__':
     # @param firstCall First FunctionCall for this object.
     # @return Whether or not an object must be created with the default constructor.
     def mustDefaultConstruct(self, aLanguageObject, firstCall):
-        '''
+        """
         Tell whether or not an object must be created with the default constructor 
-        '''
+        """
         if aLanguageObject.getLanguageType() == LanguageType.INSTANCE:
             #Object that don't call methods are not constructed
             if firstCall.getMethodType() != FunctionCall.MethodType.CONSTRUCTOR:
@@ -762,9 +747,9 @@ if __name__ == '__main__':
     # @param self The PythonTokensGenerator instance.
     # @param aLanguageObject A LanguageObject.
     def defaultConstruct(self, aLanguageObject):
-        '''
+        """
         Call the object's default constructor.
-        '''
+        """
         assert self.languageObjectIsDeclared(aLanguageObject)
         varInfo = self.getVariableInfo(aLanguageObject)
         parentClass = aLanguageObject.getParent()
@@ -777,9 +762,9 @@ if __name__ == '__main__':
     # @param aCall A FunctionCall
     # @return Whether or not the method is a constructor.
     def methodIsConstructor(self, aLanguageObject, aCall):
-        '''
+        """
         Tell whether or not the method is a constructor (__init__).
-        '''
+        """
         return aLanguageObject.getLanguageType() == LanguageType.INSTANCE and aCall.getFunctionName() ==  PythonConstants.CONSTRUCTOR_SIGNATURE
 
     ##
@@ -787,9 +772,9 @@ if __name__ == '__main__':
     # @param returnedObject If threwException is False, the object returned by the function. If True, the exception being raised.
     # @param threwException The function has raised an exception.
     def returnedObjectFunctionPrefix(self, returnedObject, threwException):
-        '''
+        """
         In Unit Tests, initial code for a line that checks the function return value.
-        '''
+        """
         if self.sourceType_ == GeneratedSourceType.UNIT_TEST:
             functionPrefix = "self.assert"
             if threwException:
@@ -804,7 +789,7 @@ if __name__ == '__main__':
                 representation = representation.replace("'", '')
                 functionPrefix += representation
             else:
-                functionPrefix += "Equals("
+                functionPrefix += "Equal("
                 functionPrefix += self.getObjectRepresentation(returnedObject)
             functionPrefix += ", "
         else:
@@ -816,9 +801,9 @@ if __name__ == '__main__':
     # @param returnedObject If threwException is False, the object returned by the function. If True, the exception being raised.
     # @param threwException The function has raised an exception.
     def returnedObjectFunctionPosfix(self, returnedObject, threwException):
-        '''
+        """
         In Unit Tests, final code for a line that checks the function return value.
-        '''
+        """
         return ")" if self.sourceType_ == GeneratedSourceType.UNIT_TEST else ""
     
     ##
@@ -826,9 +811,9 @@ if __name__ == '__main__':
     # @param aFunctionCall A FunctionCall.
     # @return Code for this function call, to be inserted in the generated source file.
     def methodCall(self, aFunctionCall):
-        '''
+        """
         Return code for this function call, to be inserted in the generated source file.
-        '''
+        """
         calleeObject = aFunctionCall.getCallee()
         calleeLanguageType = calleeObject.getLanguageType()
         
@@ -837,7 +822,7 @@ if __name__ == '__main__':
             calleeRepresentation = eval(calleeRepresentation)
             calleePrefix = ""
             #Built in classes do not need module qualification
-            if calleeLanguageType == LanguageType.CLASS or calleeRepresentation != PythonConstants.BUILTINS_MODULE_NAME:
+            if calleeLanguageType == LanguageType.CLASS or calleeRepresentation not in PythonConstants.BUILTINS_MODULE_NAMES:
                 calleePrefix = calleeRepresentation + "."
             return self.indentation_ + calleePrefix + aFunctionCall.getFunctionName()
         
@@ -860,9 +845,9 @@ if __name__ == '__main__':
     # @param argCount Order in the arguments list for "arg".
     # @return If this argument must be skipped (for instance: "self" implicit argument in Python).
     def mustSkipArgument(self, aFunctionCall, arg, argCount):
-        '''
+        """
         Tell if this argument must be skipped (for instance: "self" implicit argument in Python).
-        '''
+        """
         calleeObject = aFunctionCall.getCallee()
         calleeLanguageType = calleeObject.getLanguageType()
         
@@ -874,36 +859,36 @@ if __name__ == '__main__':
     # @param self The PythonTokensGenerator instance.
     # @return The Dummy class declaration code.
     def declareDummyClass(self):
-        '''
+        """
         Declare Dummy class.
         Return its declaration code.
-        '''
+        """
         return self.indentation_ + "from code_cropper import dummy\n"
 
     ##
     # @param self The PythonTokensGenerator instance.
     # @return The Json module declaration code.
     def declareJsonModule(self):
-        '''
+        """
         Declare Json Module (simplejson library).
         Return its declaration code.
-        '''
+        """
         return self.indentation_ + "import json\n"
     
     ##
     # @param self The PythonTokensGenerator instance.
     # @return the sentence ending.
     def endSentence(self):
-        '''
+        """
         Return the sentence ending.
         It's an empty string (no ';' is necessary).
-        '''
+        """
         return ""
     
 class CppTokensGenerator(TokensGenerator):
-    '''
+    """
     Code generator for C++ source files.
-    '''
+    """
     INSTANCE_NAME_PREFIX = "var"
     MODULE_NAME_PREFIX = "mod"
     CLASS_NAME_PREFIX = "cls"
@@ -916,9 +901,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param sourceType Kind of source to generate (see GeneratedSourceType).
     # @param projectName Code Cropper project name.
     def __init__(self, aProgramExecution, sourceType, projectName):
-        '''
+        """
         Constructor.
-        '''
+        """
         TokensGenerator.__init__(self, aProgramExecution, sourceType, projectName)
         self.nextModuleIndex_ = 0
         self.nextClassIndex_ = 0
@@ -929,27 +914,27 @@ class CppTokensGenerator(TokensGenerator):
     # @param self The CppTokensGenerator instance.
     # @return Code to insert at the beginning of the generated file.
     def initialFileCode(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file.
-        '''
+        """
         return self.indentation_ + "#include <tchar.h>\n"
 
     ##
     # @param self The CppTokensGenerator instance.
     # @return Code to insert at the beginning of the generated file's main function.
     def beginMain(self):
-        '''
+        """
         Return code to insert at the beginning of the generated file's main function.
-        '''
+        """
         self.initSpaces_ = "\t"
         return "int _tmain(int argc, _TCHAR* argv[])\n{\n"
     ##
     # @param self The CppTokensGenerator instance.
     # @return Code to insert at the end of the generated file's main function.
     def endMain(self):
-        '''
+        """
         Return code to insert at the end of the generated file's main function.
-        '''
+        """
         self.initSpaces_ = ""
         return "}"
 
@@ -958,12 +943,12 @@ class CppTokensGenerator(TokensGenerator):
     # @param moduleInfo Module information (see VariableInfo).
     # @return The module declaration code, or an empty string if the class is already declared.
     def _declareModule(self, moduleInfo):
-        '''
+        """
         Declare a module, if not declared before.
-        '''
+        """
         moduleNameStr = self._getDeclarationCodeFromObject(moduleInfo.getPythonObject())
         moduleName = eval(moduleNameStr)
-        if moduleName == PythonConstants.BUILTINS_MODULE_NAME:
+        if moduleName in PythonConstants.BUILTINS_MODULE_NAMES:
             return "" 
         else:
             includeStr = moduleName
@@ -975,9 +960,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param classInfo Class information (see VariableInfo).
     # @return The class declaration code, or an empty string if the class is already declared.
     def _declareClass(self, classInfo):
-        '''
+        """
         Declare a class, if not declared before.
-        '''
+        """
         return ""
 
     ##
@@ -985,9 +970,9 @@ class CppTokensGenerator(TokensGenerator):
     # @myObj A Python object.
     # @return Whether or not we'll use name to refer to the variable.
     def _mustUseVarNameForRepr(self, myObj):
-        '''
+        """
         Tell whether or not we'll use name to refer to the variable. Else (for instance: basic types), use a string representation.
-        '''
+        """
         objType = type(myObj)
         if objType is types.NoneType:
             return False
@@ -1010,9 +995,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param myObj A Python object.
     # @return Declaration code for this object.
     def _getDeclarationCodeFromObject(self, myObj):
-        '''
+        """
         Get the declaration code for this object.
-        '''
+        """
         assert not self._mustUseVarNameForRepr(myObj)
         objType = type(myObj)
         if objType is types.NoneType:
@@ -1036,9 +1021,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param myType Type of the instance to declare.
     # @return The instance declaration code, or an empty string if the instance is already declared.
     def _declareInstance(self, instanceInfo, myType = ""):
-        '''
+        """
         Declare an instance, if not declared before.
-        '''
+        """
         mustDeclare = instanceInfo.getDeclarationType() != LanguageObject.DECLARATION_TYPES.CONSTRUCTOR and instanceInfo.useVarNameForRepr()
         if mustDeclare:
             myObj = instanceInfo.getPythonObject()
@@ -1074,9 +1059,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param firstCall First FunctionCall for this object.
     # @return Whether or not an object must be created with the default constructor.
     def mustDefaultConstruct(self, aLanguageObject, firstCall):
-        '''
+        """
         Tell whether or not an object must be created with the default constructor.
-        '''
+        """
         if aLanguageObject.getLanguageType() == LanguageType.INSTANCE:
             #Object that don't call methods are not constructed
             if firstCall.getMethodType() != FunctionCall.MethodType.CONSTRUCTOR:
@@ -1089,9 +1074,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param self The CppTokensGenerator instance.
     # @param aLanguageObject A LanguageObject.
     def defaultConstruct(self, aLanguageObject):
-        '''
+        """
         Call the object's default constructor.
-        '''
+        """
         assert self.languageObjectIsDeclared(aLanguageObject)
         varInfo = self.getVariableInfo(aLanguageObject)
         parentClass = aLanguageObject.getParent()
@@ -1105,9 +1090,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param aCall A FunctionCall
     # @return Whether or not the method is a constructor.
     def methodIsConstructor(self, aLanguageObject, aCall):
-        '''
+        """
         Tell whether or not the method is a constructor (i.e.: its name equals the class').
-        '''
+        """
         if aLanguageObject.getLanguageType() != LanguageType.INSTANCE:
             return False
         parentClass = aLanguageObject.getParent()
@@ -1120,9 +1105,9 @@ class CppTokensGenerator(TokensGenerator):
     # @param aFunctionCall A FunctionCall.
     # @return Code for this function call, to be inserted in the generated source file.
     def methodCall(self, aFunctionCall):
-        '''
+        """
         Return code for this function call, to be inserted in the generated source file.
-        '''
+        """
         calleeObject = aFunctionCall.getCallee()
         calleeLanguageType = calleeObject.getLanguageType()
         
@@ -1156,46 +1141,46 @@ class CppTokensGenerator(TokensGenerator):
     # @param argCount Order in the arguments list for "arg".
     # @return If this argument must be skipped (for instance: "self" implicit argument in Python).
     def mustSkipArgument(self, aFunctionCall, arg, argCount):
-        '''
+        """
         Tell if this argument must be skipped (for instance: "self" implicit argument in Python).
 		No skipping in C++ (as Python with its 'self' or 'cls' arguments.
-        '''
+        """
         return False 
         
     ##
     # @param self The CppTokensGenerator instance.
     # @return The Dummy class declaration code.
     def declareDummyClass(self):
-        '''
+        """
         Declare Dummy class.
         Return its declaration code.
-        '''
+        """
         return self.indentation_ + "#include <code_cropper/Dummy.h>\n"
 
     ##
     # @param self The CppTokensGenerator instance.
     # @return The Json module declaration code.    
     def declareJsonModule(self):
-        '''
+        """
         Unused.
-        '''
+        """
         return ""
     
     ##
     # @param self The CppTokensGenerator instance.
     # @return the sentence ending.
     def endSentence(self):
-        '''
+        """
         Return the sentence ending.
         It's an empty string (no ';' is necessary).
-        '''
+        """
         return ";"
 
 
-class TokensGeneratorFactory(object):
-    '''
+class TokensGeneratorFactory:
+    """
     Factory pattern to create a TokensGenerator, based on the programming language.
-    '''
+    """
     @staticmethod
     # @param aProgramExecution Program execution call graph.
     # @param sourceType Kind of source to generate (see GeneratedSourceType).
@@ -1211,10 +1196,10 @@ class TokensGeneratorFactory(object):
 ##
 # @param functionCalls: All the program calls (see call_graph.FunctionCall).
 def _mustUseDummy(functionCalls):
-    '''
+    """
     Return if "Dummy" module must be used
     (at least one Dummy instance will be created).
-    '''
+    """
     useDummy = False
     for aCall in functionCalls:
         if useDummy:
@@ -1229,20 +1214,20 @@ def _mustUseDummy(functionCalls):
                 useDummy = True
     return useDummy
 
-class CodeGenerator(object):
-    '''
+class CodeGenerator:
+    """
     Generates an equivalent program, or unit test,
     starting from a Json database.
-    '''
+    """
     ALL_LEVELS = -1
     ##
     # @param self The CodeGenerator to construct.
     # @param callGraphStream File object with the call graph.
     # @param projectName Code Cropper project name.
     def __init__(self, callGraphStream, projectName = None):
-        '''
+        """
         Constructor.
-        '''
+        """
         aSerializer = CallGraphSerializer()
         self.programExecution_ = aSerializer.load(callGraphStream)
         self.tokensGenerator_ = None
@@ -1254,8 +1239,8 @@ class CodeGenerator(object):
     # @param searchLevel Function nesting level to filter. Use ALL_LEVELS to generate all the calls.
     # @param sourceType The type of equivalent code to generate (see GeneratedSourceType).
     
-    def generateEquivalentProgram(self, fp, searchLevel = ProgramExecution.MIN_LEVEL, sourceType = GeneratedSourceType.MAIN_FILE ):
-        '''
+    def generateEquivalentProgram(self, fp, searchLevel = ProgramExecution.MIN_LEVEL, sourceType = GeneratedSourceType.MAIN_FILE):
+        """
         Generate an equivalent source code for the program. It may be an equivalent program or unit test.
         And the searchLevel is a filter for function nesting level.
         The default is ProgramExecution.MIN_LEVEL (only root calls).
@@ -1278,7 +1263,7 @@ class CodeGenerator(object):
         The latter is not equivalent to the original program, because f() is called twice.
         But it may be useful if the tool is used as a "logger":
         the results are more complete.
-        '''
+        """
         self.tokensGenerator_ = TokensGeneratorFactory.createTokensGenerator(self.programExecution_, sourceType, self.projectName_)
         fp.write(self.tokensGenerator_.initialFileCode())
         langObjects = self.programExecution_.getLanguageObjects()

@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,12 +14,12 @@
 # SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
+"""
 Python language related stuff.
-'''
-class PythonConstants(object):
-    '''
+"""
+class PythonConstants:
+    """
     Constants for Python language.
-    '''
+    """
     CONSTRUCTOR_SIGNATURE = '__init__'
-    BUILTINS_MODULE_NAME  = "__builtin__"
+    BUILTINS_MODULE_NAMES = ('__builtin__', 'builtins',)

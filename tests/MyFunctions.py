@@ -1,7 +1,7 @@
 # This file is part of Code Cropper
 # The tool has been designed and developed by Eng. Gervasio Calderon
 # 
-# Copyright (c) 2019, Core Security Technologies
+# Copyright (c) 2022, Core Security Technologies
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,29 +16,29 @@
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #Empty print for not disturbing the unit tests output
-def myPrint( str ):
+def myPrint(str):
     pass
 
-def add( i,  j):
+def add(i,  j):
     return 25 #i + j
     
-def subtract( i,  j):
+def subtract(i,  j):
     return None
     
-def mySubstring( str,  length ):
+def mySubstring(str,  length):
     return str[:length]
 
-def processList( aList ):
-    myPrint( "Entered processList" )
+def processList(aList):
+    myPrint("Entered processList")
     for elem in aList:
         myPrint ("elem: " + repr(elem) + "\n")
 
-def processDict( aDict ):
-    myPrint( "Entered processDict" )
+def processDict(aDict):
+    myPrint("Entered processDict")
     for elem in aDict.items():
         key,  value = elem
-        myPrint( "key: " + repr(key) + "\n" )
-        myPrint( "value: " + repr(value) + "\n" )
+        myPrint("key: " + repr(key) + "\n")
+        myPrint("value: " + repr(value) + "\n")
         
 def innerFunction():
     pass
@@ -49,35 +49,35 @@ def outerFunction():
 def noParamsFunction():
     return MyClass()
 
-class MyClass(object):
+class MyClass:
     def f1(self):
-        myPrint( "No params" )
+        myPrint("No params")
         return self
     def f2(self, i):
-        myPrint( "i:" + repr(i) )
+        myPrint("i:" + repr(i))
     def f3(self, aList):
         x = aList[0]
-        myPrint( "x:" + repr(x) )
+        myPrint("x:" + repr(x))
     def f4(self, aDict, anObj):
         x = aDict['x']
         y = aDict['y']
-        myPrint("x: " + repr(x) + ", y:" + repr(y) )
+        myPrint("x: " + repr(x) + ", y:" + repr(y))
         myPrint("anObj: "  + repr(anObj))
     def f5(self, obj1, obj2):
         myPrint("obj1: " + str(obj1) + ", obj2: " + str(obj2)) 
 
-class ClassWithDummyParameters(object):
+class ClassWithDummyParameters:
     def f1(self, d):
-        myPrint( "Dummy parameter" )
+        myPrint("Dummy parameter")
         
-class NonAnnotatedClass(object):
+class NonAnnotatedClass:
     pass
 
-class ClassWithConstructor(object):
+class ClassWithConstructor:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        myPrint( "No params" )
+        myPrint("No params")
     def getX(self):
         return self.x
     def setX(self,x):
@@ -87,19 +87,19 @@ class ClassWithConstructor(object):
     def setY(self, y):
         self.y = y
         
-class ClassWithStaticAndClassMethods(object):
+class ClassWithStaticAndClassMethods:
     @staticmethod
     def static0():
-        myPrint( "static0")
+        myPrint("static0")
     @staticmethod
-    def static1( x ):
-        myPrint( "x: " + repr(x) )
+    def static1(x):
+        myPrint("x: " + repr(x))
     @classmethod
     def classMethod0(cls):
-        myPrint( "Class is " + repr(cls) )
+        myPrint("Class is " + repr(cls))
     @classmethod
     def classMethod1(cls,x):
-        myPrint( "Class is " + repr(cls) + "x = " + str(x) )
+        myPrint("Class is " + repr(cls) + "x = " + str(x))
         
 def func1():
     return 1
